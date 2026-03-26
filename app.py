@@ -25,4 +25,4 @@ def handle_hand_data(hands):
 
 if __name__ == '__main__':
     # 使用 ssl_context='adhoc' 开启临时 HTTPS，方便手机摄像头调用
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True, ssl_context='adhoc')
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True, ssl_context='adhoc',allow_unsafe_werkzeug=True)
