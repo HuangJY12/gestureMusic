@@ -3,8 +3,9 @@ from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
-# 生产环境下通常建议指定具体的域名，测试阶段保持 "*"
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='gevent')
+
+# 不显式指定 async_mode，让它在本地用 threading，在 Render 用 eventlet
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 @app.route('/')
 def index():
@@ -12,15 +13,12 @@ def index():
 
 @socketio.on('my_hand_data')
 def handle_hand_data(hands):
-    user_id = request.sid
-    # 广播给所有人
     emit('update_skeletons', {
-        'user_id': user_id,
+        'user_id': request.sid,
         'hands': hands
     }, broadcast=True)
 
 if __name__ == '__main__':
-    # 从环境变量读取端口，默认为 10000 (Render 默认端口)
-    port = int(os.environ.get('PORT', 10000))
-    # 生产环境不要开启 allow_unsafe_werkzeug，也不要传 ssl_context
-    socketio.run(app, host='0.0.0.0', port=port)
+    # 这里的代码仅在你本地运行 python app.py 时执行
+    port = int(os.environ.get('PORT', 5000))
+    socketio.run(app, host='0.0.0.0', port=port, debug=True)
