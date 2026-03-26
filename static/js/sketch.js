@@ -3,7 +3,7 @@ let allUsersHands = {};
 let ac = new AudioContext();
 let soundPool = {};
 let myInstrument = "acoustic_grand_piano";
-let myUsername = "神秘音乐家";
+let myUsername = "Mysterious Musician";
 let particlesMain = [];
 // 1. 乐器分类与颜色方案
 const instrumentCategories = {
@@ -28,14 +28,14 @@ const HAND_CONNECTIONS = [[0, 1], [1, 2], [2, 3], [3, 4], [0, 5], [5, 9], [9, 13
 function loadToPool(name) {
     let statusNode = document.getElementById('status-info');
     if (soundPool[name]) {
-        if (statusNode) statusNode.innerText = "✅ 就绪: " + name;
+        if (statusNode) statusNode.innerText = "✅ Ready: " + name;
         return;
     }
-    if (statusNode) statusNode.innerText = "⏳ 加载中: " + name;
+    if (statusNode) statusNode.innerText = "⏳ Loading: " + name;
 
     Soundfont.instrument(ac, name, { soundfont: 'MusyngKite' }).then(inst => {
         soundPool[name] = inst;
-        if (statusNode) statusNode.innerText = "✅ 就绪: " + name;
+        if (statusNode) statusNode.innerText = "✅ Ready: " + name;
     });
 }
 
