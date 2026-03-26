@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多人骨骼乐器空间 Pro</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/soundfont-player@0.12.0/dist/soundfont-player.min.js"></script>
+
+    <style>
+        body { margin: 0; padding: 0; background-color: #050505; color: white; font-family: 'Segoe UI', system-ui, sans-serif; overflow: hidden; }
+
+        /* --- 登录页 --- */
+        #login-screen {
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 1000; background: #000; transition: opacity 0.8s ease;
+        }
+        #particle-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+        
+        .login-box {
+            position: relative; z-index: 2; background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px); padding: 50px; border-radius: 20px;
+            border: 1px solid rgba(0, 255, 204, 0.3); text-align: center;
+        }
+        .login-box h1 { margin: 0 0 20px; color: #00FFCC; font-weight: 300; letter-spacing: 4px; }
+        .login-box input {
+            width: 250px; padding: 12px; margin-bottom: 25px;
+            background: rgba(0,0,0,0.6); border: 1px solid #00FFCC;
+            color: white; border-radius: 8px; font-size: 16px; text-align: center; outline: none;
+        }
+        .login-box button {
+            background: #00FFCC; color: #000; border: none; padding: 12px 40px;
+            font-size: 18px; border-radius: 30px; cursor: pointer; font-weight: bold;
+            transition: all 0.3s;
+        }
+        .login-box button:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0, 255, 204, 0.4); }
+
+        /* --- 主 UI 层 --- */
+        #ui-layer { position: absolute; top: 20px; left: 20px; z-index: 100; display: none; }
+        #status-info { font-size: 14px; color: #00FFCC; text-shadow: 0 0 5px #00FFCC; }
+
+        /* --- 乐器 HUD 窗口 --- */
+        #instrument-hud {
+            position: absolute; bottom: 40px; right: 40px;
+            width: 300px; padding: 25px; border-radius: 24px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 2px solid #00FFCC; /* 动态颜色会覆盖这里 */
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            text-align: center; transition: all 0.5s ease;
+            display: none; z-index: 100;
+        }
+        .hud-hint { font-size: 10px; color: #888; text-transform: uppercase; margin-bottom: 15px; }
+        #current-cat-name { font-size: 14px; font-weight: 600; letter-spacing: 2px; margin-bottom: 5px; }
+        #current-inst-name { 
+            font-size: 24px; font-weight: 800; margin: 15px 0; 
+            min-height: 70px; display: flex; align-items: center; justify-content: center;
+        }
+        
+        .gesture-grid {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr;
+            gap: 10px; opacity: 0.2; margin-top: 10px;
+        }
+        .arrow { font-size: 18px; transition: 0.2s; }
+        .active-arrow { opacity: 1; color: inherit; transform: scale(1.4); }
+
+        #canvas-container { width: 100vw; height: 100vh; }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <canvas id="particle-canvas"></canvas>
+        <div class="login-box">
+            <h1>VIRTUAL ORCHESTRA</h1>
+            <input type="text" id="username-input" placeholder="输入昵称..." maxlength="10">
+            <br>
+            <button id="join-btn">开启空间</button>
+        </div>
+    </div>
+
+    <div id="ui-layer">
+        <div id="status-info">系统就绪</div>
+    </div>
+
+    <div id="instrument-hud">
+        <div class="hud-hint">Swipe Horizontal: Category | Vertical: Instrument</div>
+        <div id="current-cat-name">PIANO</div>
+        <div id="current-inst-name">Acoustic Grand Piano</div>
+        
+        <div class="gesture-grid">
+            <div></div> <div id="arr-up" class="arrow">▲</div> <div></div>
+            <div id="arr-left" class="arrow">◀</div> 
+            <div id="arr-down" class="arrow">▼</div> 
+            <div id="arr-right" class="arrow">▶</div>
+        </div>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script src="{{ url_for('static', filename='js/firstPage.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/sketch.js') }}"></script>
+</body>
+</html>
